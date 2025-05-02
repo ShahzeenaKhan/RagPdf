@@ -10,5 +10,5 @@ opentelemetry-sdk==1.22.0
 huggingface-hub
 pypdf
 numpy==1.23.5
-langchain-groq
+
 
