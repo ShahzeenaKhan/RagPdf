@@ -22,7 +22,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 
 # vector store
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
+
 
 ## PDF file loader (loads a single PDF into docs)
 from langchain_community.document_loaders import PyPDFLoader
@@ -105,13 +106,11 @@ if not splits:
 
 @st.cache_resource(show_spinner=False)
 def get_vectorstore(_splits):
-
-    return Chroma.from_documents(
+    return FAISS.from_documents(
         _splits,
         embedding=embeddings
-        
-       
     )
+
 vectorstore = get_vectorstore(splits)
 retriever = vectorstore.as_retriever()
 
