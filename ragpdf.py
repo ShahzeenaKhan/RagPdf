@@ -22,7 +22,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 
 # vector store
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 
 ## PDF file loader (loads a single PDF into docs)
 from langchain_community.document_loaders import PyPDFLoader
@@ -52,11 +52,7 @@ st.sidebar.write(
 
 api_key = st.sidebar.text_input("Groq API Key", type="password")
 os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN","") # for HuggingFace embeddings
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"}
-)
-
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # only proceed if the user has entered their Groq Key
 
@@ -109,12 +105,12 @@ if not splits:
 
 @st.cache_resource(show_spinner=False)
 def get_vectorstore(_splits):
+
     return Chroma.from_documents(
         _splits,
         embedding=embeddings,
-        persist_directory="chroma_db"  # shorter, avoids Windows filename limit
+        persist_directory="./chroma_index"
     )
-
 vectorstore = get_vectorstore(splits)
 retriever = vectorstore.as_retriever()
 
@@ -136,8 +132,8 @@ history_aware_retriever = create_history_aware_retriever(
 # QA Chain: "stuff" all retrieved docs into the LLM
 
 qa_prompt  = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant. Only answer based on the context provided. "
-               "Do NOT guess or hallucinate. If the answer isn't in the context, reply 'Not found in the document.'\n\nContext:\n{context}"),
+    ("system", "You are an assistant. Use the retrieved context to answer."
+                "If you don't know, say so. Keep it under three sentences.\n\n{context}"),
     MessagesPlaceholder("chat_history"),
     ("human","{input}"),
 ])
@@ -195,4 +191,3 @@ if user_question:
             st.write(f"**{role.title()}: ** {content}")
 else:
     st.info("ℹ️ Upload one or more PDFs above to begin.")
-
