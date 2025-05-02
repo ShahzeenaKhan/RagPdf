@@ -109,7 +109,7 @@ def get_vectorstore(_splits):
     return Chroma.from_documents(
         _splits,
         embedding=embeddings,
-        persist_directory="./chroma_index"
+       
     )
 vectorstore = get_vectorstore(splits)
 retriever = vectorstore.as_retriever()
