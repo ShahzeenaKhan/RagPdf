@@ -109,6 +109,7 @@ def get_vectorstore(_splits):
     return Chroma.from_documents(
         _splits,
         embedding=embeddings,
+        persist_directory="/tmp/chroma_index"
        
     )
 vectorstore = get_vectorstore(splits)
