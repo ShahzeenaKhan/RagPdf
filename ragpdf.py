@@ -104,7 +104,7 @@ if not splits:
 
 # Build or load the Chroma vector store (caching for performance)
 
-@st.cache_resource(show_spinner=False)
+# @st.cache_resource(show_spinner=False)
 def get_vectorstore(_splits):
     return FAISS.from_documents(
         _splits,
